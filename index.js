@@ -1,10 +1,10 @@
 const express = require('express')
 const app = express()
 require('dotenv').config()
+const cors = require('cors')
 const port = process.env.PORT || 3000
 
-
-
+app.use(cors())
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASS}@cluster0.malve12.mongodb.net/?retryWrites=true&w=majority`;
@@ -17,20 +17,17 @@ const client = new MongoClient(uri, {
   }
 });
 
-async function run() {
-  try {
-
-    await client.connect();
-  
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    // await client.close();
-  }
+const dbConnect = async () => {
+    try {
+        client.connect()
+        console.log('DB Connected Successfully✅')
+    } catch (error) {
+        console.log(error.name, error.message)
+    }
 }
-run().catch(console.dir);
+dbConnect();
 
+const takingDatabase = client.db("Task").collection("takingData");
 
 
 app.get('/', (req,res)=>{
