@@ -29,6 +29,44 @@ dbConnect();
 
 const takingDatabase = client.db("Task").collection("takingData");
 
+// Create Note
+app.post('/api/v1/notes', async (req, res) => {
+    const note = {
+        title: req.body.title,
+        content: req.body.content,
+        created_at: new Date(),
+        updated_at: new Date()
+      };
+
+      try {
+        const result = await takingDatabase.insertOne(note);
+        res.send(result);
+      } catch (error) {
+        res.status(400).json({ error: error.message });
+      }
+  });
+  
+  // Retrieve Notes
+  app.get('/api/v1/notes', async (req, res) => {
+    // ...
+  });
+  
+  // Retrieve Single Note by ID
+  app.get('/api/v1/notes/:id', async (req, res) => {
+    // ...
+  });
+  
+  // Update Note
+  app.put('/api/v1/notes/:id', async (req, res) => {
+    // ...
+  });
+  
+  // Delete Note
+  app.delete('/api/v1/notes/:id', async (req, res) => {
+    // ...
+  });
+  
+
 
 app.get('/', (req,res)=>{
     res.send('Welcome to my server!')
