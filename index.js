@@ -60,7 +60,7 @@ app.get('/api/v1/notes', async (req, res) => {
 // Retrieve Single Note by ID
 app.get('/api/v1/notes/:id', async (req, res) => {
     const id = req.params.id;
-    const query = { _id: new ObjectId(id) };
+    const query = { _id: new ObjectId(id)};
     try {
         const result = await takingDatabase.findOne(query)
         res.send(result);
@@ -72,12 +72,26 @@ app.get('/api/v1/notes/:id', async (req, res) => {
 // Update Note
 app.put('/api/v1/notes/:id', async (req, res) => {
     const id = req.params.id;
+    const filter = { _id: new ObjectId(id)};
+    const update = {
+        $set:{
+            content: req.body.content,
+            updated_at: new Date()
+        }
+    }
+    try {
+        const result = await takingDatabase.updateOne(filter , update);
+        res.send(result)
+    } catch (error) {
+        res.status(500).send({ error: 'Internal server error' });
+    }
 
 });
 
 // Delete Note
 app.delete('/api/v1/notes/:id', async (req, res) => {
-    // ...
+    const id = req.params.id;
+
 });
 
 
