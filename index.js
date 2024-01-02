@@ -2,10 +2,14 @@ const express = require('express')
 const app = express()
 require('dotenv').config()
 const cors = require('cors')
+const bodyParser = require('body-parser');
 const port = process.env.PORT || 3000
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
-app.use(cors())
+// middleware
+app.use(cors());
+app.use(express.json())
+app.use(bodyParser.json())
 
 
 const uri = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASS}@cluster0.malve12.mongodb.net/?retryWrites=true&w=majority`;
@@ -31,17 +35,17 @@ dbConnect();
 const takingDatabase = client.db("Task").collection("takingData");
 
 // Create Note
-app.post('/api/v1/notes', async (req, res) => {
-    const note = {
-        title: req.body.title,
-        content: req.body.content,
-        created_at: new Date(),
-        updated_at: new Date()
-    };
-
+app.post('/api/v1/notes', async(req, res) => {
+    // const note = {
+    //     title: req.body.title,
+    //     content: req.body.content,
+    //     created_at: new Date(),
+    //     updated_at: new Date()
+    // };
+console.log(req.body);
     try {
-        const result = await takingDatabase.insertOne(note);
-        res.send(result);
+        // const result = await takingDatabase.insertOne(note);
+        // res.send(result);
     } catch (error) {
         res.status(400).send({ error: error.message });
     }
