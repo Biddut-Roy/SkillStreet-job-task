@@ -91,6 +91,13 @@ app.put('/api/v1/notes/:id', async (req, res) => {
 // Delete Note
 app.delete('/api/v1/notes/:id', async (req, res) => {
     const id = req.params.id;
+    const query = { _id: new ObjectId(id)};
+    try {
+        const result = await takingDatabase.deleteOne(query);
+        res.send(result)
+    } catch (error) {
+        res.status(500).send({error: 'Internal Server Error'});
+    }
 
 });
 
