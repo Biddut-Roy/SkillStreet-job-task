@@ -39,7 +39,7 @@ const takingDatabase = client.db("Task").collection("takingData");
 
 // Create middleware 
 const validateNoteCreation = [
-    body('title').trim().isLength({ min: 1, max: 80 }).withMessage('Title is required and must be between 1 and 255 characters'),
+    body('title').trim().isLength({ min: 1, max: 80 }).withMessage('Title is required and must be between 1 and 80 characters'),
     body('content').trim().isLength({ min: 1, max: 400 }).withMessage('Content is required'),
     (req, res, next) => {
       const errors = validationResult(req);
@@ -51,8 +51,7 @@ const validateNoteCreation = [
   ];
   
   const validateNoteUpdating = [
-    body('title').optional().trim().isLength({ min: 1, max: 80 }).withMessage('Title must be between 1 and 255 characters'),
-    body('content').optional().trim().isLength({ min: 1, max: 400 }).withMessage('Content is required'),
+    body('content').optional().trim().isLength({ min: 1, max: 400 }).withMessage('Content is required and must be between 1 and 400 characters'),
     (req, res, next) => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
