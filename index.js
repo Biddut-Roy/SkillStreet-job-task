@@ -62,6 +62,7 @@ const validateNoteCreation = [
     }
   ];
 
+//   Authentication
   const authenticate = (req, res, next) => {
     const unauthorized = (res) => {
       res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
@@ -84,7 +85,7 @@ const validateNoteCreation = [
 
 
 // Create Note
-app.post('/api/v1/notes',validateNoteCreation,async(req, res) => {
+app.post('/api/v1/notes',authenticate,validateNoteCreation,async(req, res) => {
     const note = {
         title: req.body.title,
         content: req.body.content,
@@ -111,7 +112,7 @@ app.get('/api/v1/notes',authenticate,async (req, res) => {
 });
 
 // Retrieve Single Note by ID
-app.get('/api/v1/notes/:id', async (req, res) => {
+app.get('/api/v1/notes/:id',authenticate,async (req, res) => {
     const id = req.params.id;
     const query = { _id: new ObjectId(id)};
     try {
@@ -123,7 +124,7 @@ app.get('/api/v1/notes/:id', async (req, res) => {
 });
 
 // Update Note
-app.put('/api/v1/notes/:id',validateNoteUpdating,async (req, res) => {
+app.put('/api/v1/notes/:id',authenticate,validateNoteUpdating,async (req, res) => {
     const id = req.params.id;
     const filter = { _id: new ObjectId(id)};
     const update = {
@@ -142,7 +143,7 @@ app.put('/api/v1/notes/:id',validateNoteUpdating,async (req, res) => {
 });
 
 // Delete Note
-app.delete('/api/v1/notes/:id', async (req, res) => {
+app.delete('/api/v1/notes/:id',authenticate,async (req, res) => {
     const id = req.params.id;
     const query = { _id: new ObjectId(id)};
     try {
