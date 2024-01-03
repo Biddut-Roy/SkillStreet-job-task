@@ -1,8 +1,9 @@
-const express = require('express')
-const app = express()
-require('dotenv').config()
-const cors = require('cors')
+const express = require('express');
+const app = express();
+require('dotenv').config();
+const cors = require('cors');
 const bodyParser = require('body-parser');
+const { body , validationResult } = require('express-validator')
 const port = process.env.PORT || 3000
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
@@ -34,18 +35,46 @@ dbConnect();
 
 const takingDatabase = client.db("Task").collection("takingData");
 
+
+
+// Create middleware 
+const validateNoteCreation = [
+    body('title').trim().isLength({ min: 1, max: 80 }).withMessage('Title is required and must be between 1 and 255 characters'),
+    body('content').trim().isLength({ min: 1, max: 400 }).withMessage('Content is required'),
+    (req, res, next) => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+      next();
+    }
+  ];
+  
+  const validateNoteUpdating = [
+    body('title').optional().trim().isLength({ min: 1, max: 80 }).withMessage('Title must be between 1 and 255 characters'),
+    body('content').optional().trim().isLength({ min: 1, max: 400 }).withMessage('Content is required'),
+    (req, res, next) => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+      next();
+    }
+  ];
+
+
 // Create Note
 app.post('/api/v1/notes', async(req, res) => {
-    // const note = {
-    //     title: req.body.title,
-    //     content: req.body.content,
-    //     created_at: new Date(),
-    //     updated_at: new Date()
-    // };
+    const note = {
+        title: req.body.title,
+        content: req.body.content,
+        created_at: new Date(),
+        updated_at: new Date()
+    };
 console.log(req.body);
     try {
-        // const result = await takingDatabase.insertOne(note);
-        // res.send(result);
+        const result = await takingDatabase.insertOne(note);
+        res.send(result);
     } catch (error) {
         res.status(400).send({ error: error.message });
     }
