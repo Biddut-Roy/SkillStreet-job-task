@@ -4,6 +4,7 @@ require('dotenv').config();
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { body , validationResult } = require('express-validator')
+const basicAuth = require('basic-auth');
 const port = process.env.PORT || 3000
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
@@ -13,7 +14,7 @@ app.use(express.json())
 app.use(bodyParser.json())
 
 
-const uri = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASS}@cluster0.malve12.mongodb.net/?retryWrites=true&w=majority`;
+const uri = process.env.DATABASE_LOCAL
 
 const client = new MongoClient(uri, {
     serverApi: {
@@ -61,16 +62,36 @@ const validateNoteCreation = [
     }
   ];
 
+  const authenticate = (req, res, next) => {
+    const unauthorized = (res) => {
+      res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
+      return res.sendStatus(401);
+    };
+  
+    const user = basicAuth(req);
+  
+    if (!user || !user.name || !user.pass) {
+      return unauthorized(res);
+    }
+  
+    // Replace 'username' and 'password' with your actual username and password
+    if (user.name === 'Skill' && user.pass === 'Skill-Task') {
+      return next();
+    } else {
+      return unauthorized(res);
+    }
+  };
+
 
 // Create Note
-app.post('/api/v1/notes', async(req, res) => {
+app.post('/api/v1/notes',validateNoteCreation,async(req, res) => {
     const note = {
         title: req.body.title,
         content: req.body.content,
         created_at: new Date(),
         updated_at: new Date()
     };
-console.log(req.body);
+
     try {
         const result = await takingDatabase.insertOne(note);
         res.send(result);
@@ -80,7 +101,7 @@ console.log(req.body);
 });
 
 // Retrieve Notes
-app.get('/api/v1/notes', async (req, res) => {
+app.get('/api/v1/notes',authenticate,async (req, res) => {
     try {
         const result = await takingDatabase.find().toArray();
         res.send(result);
@@ -102,7 +123,7 @@ app.get('/api/v1/notes/:id', async (req, res) => {
 });
 
 // Update Note
-app.put('/api/v1/notes/:id', async (req, res) => {
+app.put('/api/v1/notes/:id',validateNoteUpdating,async (req, res) => {
     const id = req.params.id;
     const filter = { _id: new ObjectId(id)};
     const update = {
